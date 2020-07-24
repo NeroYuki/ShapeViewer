@@ -15,6 +15,7 @@ var gui;
 var positionFolder;
 var rotationFolder;
 var scaleFolder;
+var pointLightFolder;
 
 var mouse = {
     x: 0,
@@ -26,7 +27,7 @@ var lights = []
 lights[0] = new THREE.PointLight(0xffffff);
 lights[1] = new THREE.AmbientLight(0xffffff, 0.2)
 //set default lighting position
-lights[0].position.set(0, 0, 15);
+lights[0].position.set(3, 3, 3);
 
 var sphereSize = 0.2;
 var pointLightHelper = new THREE.PointLightHelper( lights[0], sphereSize );
@@ -99,9 +100,15 @@ window.onload = function($) {
 
     var lightingFolder = gui.addFolder("Lighting")
     lightingFolder.add(option, "ambientLightIntensity", 0, 1).step(0.01).name("Ambient").onChange(updateLighting)
-    lightingFolder.add(option, "lighting").name("Point Light").onChange(updateLighting)
-    lightingFolder.add(option, "lightsource").name("Mouse Light").onChange(updateLighting)
-    lightingFolder.add(option, "shadow").name("Enable Shadow").onChange(updateLighting)
+
+    pointLightFolder = lightingFolder.addFolder("Point Light")
+
+    pointLightFolder.add(option, "lighting").name("Enable").onChange(updateLighting)
+    pointLightFolder.add(option, "lightsource").name("Enable Mouse").onChange(updateLighting)
+    pointLightFolder.add(option, "lightingPosX", -10, 10).step(0.1).name("X").onChange(updateLighting)
+    pointLightFolder.add(option, "lightingPosY", -10, 10).step(0.1).name("Y").onChange(updateLighting)
+    pointLightFolder.add(option, "lightingPosZ", -10, 10).step(0.1).name("Z").onChange(updateLighting)
+    pointLightFolder.add(option, "shadow").name("Enable Shadow").onChange(updateLighting)
 
     var transformFolder = gui.addFolder("Transform")
 
@@ -148,7 +155,12 @@ window.onmousemove = function(event) {
         var pos = camera.position.clone().add(dir.multiplyScalar(distance));
         //mouseMesh.position.copy(pos);
 
-        lights[0].position.copy(new THREE.Vector3(pos.x, pos.y, pos.z + 2));
+        lights[0].position.copy(new THREE.Vector3(pos.x, pos.y, option.lightingPosZ));
+        option.lightingPosX = pos.x
+        option.lightingPosY = pos.y
+        for (var j in pointLightFolder.__controllers) {
+            pointLightFolder.__controllers[j].updateDisplay()
+        }
     }
 
     if (!globalState.onDrag) return
@@ -241,7 +253,10 @@ function updateLighting() {
     }
 
     if (option.lightsource) {
-        lights[0].position.set(15, 15, 15);
+        lights[0].position.set(3, 3, 2);
+    }
+    else {
+        lights[0].position.set(option.lightingPosX, option.lightingPosY, option.lightingPosZ)
     }
 
     if (option.shadow) {
