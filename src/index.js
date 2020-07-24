@@ -24,7 +24,7 @@ var mouse = {
 //0: point light (bright light, on if lighting option is enabled, move with mouse if lightsource is enabled), 1: ambient light (very dim, always on)
 var lights = []
 lights[0] = new THREE.PointLight(0xffffff);
-lights[1] = new THREE.AmbientLight(0x111111);
+lights[1] = new THREE.AmbientLight(0xffffff, 0.2)
 //set default lighting position
 lights[0].position.set(0, 0, 15);
 
@@ -98,8 +98,9 @@ window.onload = function($) {
     lookAtUpFolder.add(option, "lookAtUpZ", -1, 1).step(0.01).name("Z").onChange(updateCamera)
 
     var lightingFolder = gui.addFolder("Lighting")
-    lightingFolder.add(option, "lighting").name("Enable").onChange(updateLighting)
-    lightingFolder.add(option, "lightsource").name("Light Source").onChange(updateLighting)
+    lightingFolder.add(option, "ambientLightIntensity", 0, 1).step(0.01).name("Ambient").onChange(updateLighting)
+    lightingFolder.add(option, "lighting").name("Point Light").onChange(updateLighting)
+    lightingFolder.add(option, "lightsource").name("Mouse Light").onChange(updateLighting)
     lightingFolder.add(option, "shadow").name("Enable Shadow").onChange(updateLighting)
 
     var transformFolder = gui.addFolder("Transform")
@@ -231,6 +232,7 @@ function render() {
 
 //update point light
 function updateLighting() {
+    lights[1].intensity = option.ambientLightIntensity
     if (option.lighting) {
         scene.add(lights[0])
     }

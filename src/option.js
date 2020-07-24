@@ -2,6 +2,7 @@
 export class Option {
     constructor() {
         //lighting
+        this.ambientLightIntensity = 0.2;
         this.lighting = true;
         this.lightsource = false;
         this.shadow = false;
